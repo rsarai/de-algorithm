@@ -6,16 +6,19 @@ from parameters import (
 	dimensions
 )
 from functions import AFunction
+from selections import ASelection
 
 
 class DifferentialEvolution():
 	function = AFunction
 	floating_scale_factor = False
 	scale_factor = 0.5
+	selection = ASelection
 
-	def __init__(self, function, type_scale_factor):
+	def __init__(self, function, type_scale_factor, selection):
 		self.function = function
 		self.floating_scale_factor = type_scale_factor
+		self.selection = selection
 
 		if type_scale_factor:
 			self.scale_factor = 0.9
@@ -30,7 +33,7 @@ class DifferentialEvolution():
 			personal_best = []
 			for i in range(0, len(population)):
 				fitness = self.function.calculate_fitness(population[i])
-				experimental_vector = self.create_trial_vector(population)
+				experimental_vector = self.create_trial_vector(population, population[i])
 				new_individuo = self.create_offspring(population[i], experimental_vector)
 				new_fitness = self.function.calculate_fitness(new_individuo)
 				if new_fitness < fitness:
@@ -60,10 +63,11 @@ class DifferentialEvolution():
 				new_individuo.insert(i, individuo[i])
 		return new_individuo
 
-	def create_trial_vector(self, population):
+	def create_trial_vector(self, population, individuo):
 		new_pop = copy.deepcopy(population)
+		new_pop.remove(individuo)
 
-		destiny = new_pop[random.randint(0, len(new_pop) - 1)]
+		destiny = self.selection.selection_target_vector(new_pop, self.function, individuo)
 		new_pop.remove(destiny)
 
 		vect1 = new_pop[random.randint(0, len(new_pop) - 1)]
