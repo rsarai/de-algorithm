@@ -1,6 +1,10 @@
 import random
 import copy
 
+from parameters import (
+	iterations_number, num_of_individuos, probability_of_recombination,
+	dimensions
+)
 from functions import AFunction
 
 
@@ -17,21 +21,17 @@ class DifferentialEvolution():
 			self.scale_factor = 0.9
 
 	def differential_evolution(self):
-		num_of_individuos = 30
 		population = []
-		probability_of_recombination = 0.6
-		iterations_number = 10000
 		best = 0
-		best_vector = []
 
-		population = self.initializa_population(num_of_individuos)
+		population = self.initializa_population()
 
 		for j in range(0, iterations_number):
 			personal_best = []
 			for i in range(0, len(population)):
 				fitness = self.function.calculate_fitness(population[i])
 				experimental_vector = self.create_trial_vector(population, population[i])
-				new_individuo = self.create_offspring(population[i], experimental_vector, probability_of_recombination)
+				new_individuo = self.create_offspring(population[i], experimental_vector)
 				new_fitness = self.function.calculate_fitness(new_individuo)
 				if new_fitness < fitness:
 					personal_best.append(new_individuo)
@@ -44,14 +44,13 @@ class DifferentialEvolution():
 				self.update_parameters()
 
 			population = personal_best
-			best_vector.append(best)
 			print(best)
-		return best_vector
+		return best
 
 	def update_parameters(self):
 		self.scale_factor -= (0.9 - 0.4) / 10000
 
-	def create_offspring(self, individuo, experimental_vector, probability_of_recombination):
+	def create_offspring(self, individuo, experimental_vector):
 		new_individuo = []
 		for i in range(0, len(individuo)):
 			limiar = random.random()
@@ -80,16 +79,17 @@ class DifferentialEvolution():
 
 		return u
 
-	def initializa_population(self, num_of_individuos):
-		dimensions = 30
-		lower_bound = -100
-		upper_bound = 100
+	def initializa_population(self):
 		population = []
 
 		for j in range(0, num_of_individuos):
 			x1 = []
 			for i in range(0, dimensions):
-				x1.append(lower_bound + random.random() * (upper_bound - lower_bound))
+				x1.append(
+					self.function.lower_bound + random.random() * (
+						self.function.upper_bound - self.function.lower_bound
+					)
+				)
 			population.insert(0, x1)
 
 		return population
