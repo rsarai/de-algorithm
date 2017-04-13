@@ -1,7 +1,7 @@
 import random
 import copy
 
-from functions import AFunction, Sphere, Rastrigin, Rosenbrocks
+from functions import AFunction
 
 
 class DifferentialEvolution():
@@ -30,7 +30,7 @@ class DifferentialEvolution():
 			personal_best = []
 			for i in range(0, len(population)):
 				fitness = self.function.calculate_fitness(population[i])
-				experimental_vector = self.create_trial_vector(population, population[i], self.scale_factor)
+				experimental_vector = self.create_trial_vector(population, population[i])
 				new_individuo = self.create_offspring(population[i], experimental_vector, probability_of_recombination)
 				new_fitness = self.function.calculate_fitness(new_individuo)
 				if new_fitness < fitness:
@@ -61,7 +61,7 @@ class DifferentialEvolution():
 				new_individuo.insert(i, individuo[i])
 		return new_individuo
 
-	def create_trial_vector(self, population, individuo, scale_factor):
+	def create_trial_vector(self, population, individuo):
 		new_pop = copy.deepcopy(population)
 		new_pop.remove(individuo)
 
@@ -76,7 +76,7 @@ class DifferentialEvolution():
 
 		u = []
 		for i in range(0, len(destiny)):
-			u.append(destiny[i] + scale_factor * (vect1[i] - vect2[i]))
+			u.append(destiny[i] + self.scale_factor * (vect1[i] - vect2[i]))
 
 		return u
 
@@ -93,11 +93,3 @@ class DifferentialEvolution():
 			population.insert(0, x1)
 
 		return population
-
-
-def main():
-	d = DifferentialEvolution(Rastrigin(), True)
-	d.differential_evolution()
-
-
-main()
